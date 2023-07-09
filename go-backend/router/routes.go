@@ -13,4 +13,6 @@ func SetupUserRoutes(app *fiber.App) {
 func SetupBooksRoutes(app *fiber.App) {
 	api := app.Group("/api/books")
 	api.Get("/", handlers.GetBooks)
+	api.Get("/:id", handlers.GetBook)
+	api.Get("/cart/:userId", handlers.GetCart)
 }

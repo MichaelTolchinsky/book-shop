@@ -23,7 +23,7 @@ func ConnectDB() {
 	mongoURI := fmt.Sprintf("mongodb+srv://%s:%s@%s/%s", os.Getenv("MONGO_ATLAS_USER"), os.Getenv("MONGO_ATLAS_PW"), os.Getenv("MONGO_ATLAS_CLUSTER"), os.Getenv("MONGO_DB_NAME"))
 
 	clientOpts := options.Client().ApplyURI(mongoURI).SetTimeout(10 * time.Second)
-	client, err := mongo.Connect(context.TODO(), clientOpts)
+	client, err := mongo.Connect(context.Background(), clientOpts)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"fmt"
 	"go-backend/database"
 	"go-backend/models"
@@ -43,5 +44,46 @@ func GetBooks(c *fiber.Ctx) error {
 		"message":  "Books fetched successfully",
 		"books":    books,
 		"maxBooks": countDocs,
+	})
+}
+
+func GetBook(c *fiber.Ctx) error {
+	bookId := c.Params("id")
+	book := database.BooksCollection.FindOne(context.Background(), bson.M{"_id": bookId})
+
+	if book == nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": fmt.Sprintf("book %s not found", bookId)})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(book)
+}
+
+func GetCart(c *fiber.Ctx) error {
+	userId := c.Params("userId")
+
+	cart := []models.CartItem{}
+	cursor, err := database.UsersCollection.Find(context.Background(), bson.M{"_id": userId})
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"message": "Cart not found",
+		})
+	}
+
+	defer cursor.Close(context.Background()) // cursor will close afer all the code benith
+	for cursor.Next(context.Background()) {
+		var cartItem models.CartItem
+		err := cursor.Decode(&cartItem)
+		if err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"message": "Cart not found",
+			})
+		}
+
+		cart = append(cart, cartItem)
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"cart":    cart,
+		"message": "cart fetched successfully",
 	})
 }
