@@ -8,6 +8,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -48,10 +49,11 @@ func GetBooks(c *fiber.Ctx) error {
 }
 
 func GetBook(c *fiber.Ctx) error {
-	bookId := c.Params("id")
-	book := database.BooksCollection.FindOne(context.Background(), bson.M{"_id": bookId})
+	var book models.Book
+	bookId, _ := primitive.ObjectIDFromHex(c.Params("id"))
 
-	if book == nil {
+	err := database.BooksCollection.FindOne(context.Background(), bson.M{"_id": bookId}).Decode(&book)
+	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": fmt.Sprintf("book %s not found", bookId)})
 	}
 
@@ -59,17 +61,16 @@ func GetBook(c *fiber.Ctx) error {
 }
 
 func GetCart(c *fiber.Ctx) error {
-	userId := c.Params("userId")
-
+	userId, _ := primitive.ObjectIDFromHex(c.Params("userId"))
 	cart := []models.CartItem{}
-	cursor, err := database.UsersCollection.Find(context.Background(), bson.M{"_id": userId})
+	cursor, err := database.UsersCollection.Find(context.Background(), bson.M{"_id": userId, "cart": bson.M{"$size": bson.M{"gt": 0}}})
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": "Cart not found",
 		})
 	}
 
-	defer cursor.Close(context.Background()) // cursor will close afer all the code benith
+	defer cursor.Close(context.Background())
 	for cursor.Next(context.Background()) {
 		var cartItem models.CartItem
 		err := cursor.Decode(&cartItem)
