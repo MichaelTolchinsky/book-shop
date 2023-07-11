@@ -61,30 +61,23 @@ func GetBook(c *fiber.Ctx) error {
 }
 
 func GetCart(c *fiber.Ctx) error {
-	userId, _ := primitive.ObjectIDFromHex(c.Params("userId"))
-	cart := []models.CartItem{}
-	cursor, err := database.UsersCollection.Find(context.Background(), bson.M{"_id": userId, "cart": bson.M{"$size": bson.M{"gt": 0}}})
+	userId, err := primitive.ObjectIDFromHex(c.Params("userId"))
 	if err != nil {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"message": "Cart not found",
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid user ID",
 		})
 	}
 
-	defer cursor.Close(context.Background())
-	for cursor.Next(context.Background()) {
-		var cartItem models.CartItem
-		err := cursor.Decode(&cartItem)
-		if err != nil {
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-				"message": "Cart not found",
-			})
-		}
-
-		cart = append(cart, cartItem)
+	user := models.User{}
+	err = database.UsersCollection.FindOne(context.Background(), bson.M{"_id": userId}).Decode(&user)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"message": "User not found",
+		})
 	}
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"cart":    cart,
-		"message": "cart fetched successfully",
+		"cart":    user.Cart,
+		"message": "Cart fetched successfully",
 	})
 }

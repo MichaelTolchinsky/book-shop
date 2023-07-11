@@ -13,20 +13,22 @@ type User struct {
 	Id       primitive.ObjectID `bson:"_id" json:"id" validate:"unique"`
 	Email    string             `json:"email" validate:"required, unique"`
 	Password string             `json:"password" validate:"required"`
-	Cart     []CartItem         `json:"cart"`
+	Cart     struct {
+		Items []CartItem `json:"items" bson:"items"`
+	} `json:"cart" bson:"cart"`
 }
 
 func (user *User) addToCart(book *Book) {
 	bookId := book.Id
 
-	cartBookIndex := sort.Search(len(user.Cart), func(i int) bool {
-		return user.Cart[i].BookId.String() == bookId.String()
+	cartBookIndex := sort.Search(len(user.Cart.Items), func(i int) bool {
+		return user.Cart.Items[i].BookId.String() == bookId.String()
 	})
 
 	if cartBookIndex >= 0 {
-		user.Cart[cartBookIndex].Quantity++
+		user.Cart.Items[cartBookIndex].Quantity++
 	} else {
-		user.Cart = append(user.Cart, CartItem{
+		user.Cart.Items = append(user.Cart.Items, CartItem{
 			BookId:   bookId,
 			Quantity: 1,
 			Price:    book.Price,
@@ -42,12 +44,12 @@ func (user *User) addToCart(book *Book) {
 func (user *User) removeFromCart(book *Book) error {
 	bookId := book.Id
 
-	cartBookIndex := sort.Search(len(user.Cart), func(i int) bool {
-		return user.Cart[i].BookId.String() == bookId.String()
+	cartBookIndex := sort.Search(len(user.Cart.Items), func(i int) bool {
+		return user.Cart.Items[i].BookId.String() == bookId.String()
 	})
 
 	if cartBookIndex >= 0 {
-		user.Cart = append(user.Cart[:cartBookIndex], user.Cart[cartBookIndex+1:]...)
+		user.Cart.Items = append(user.Cart.Items[:cartBookIndex], user.Cart.Items[cartBookIndex+1:]...)
 	}
 
 	_, err := database.UsersCollection.InsertOne(context.Background(), user)
@@ -55,7 +57,7 @@ func (user *User) removeFromCart(book *Book) error {
 }
 
 func (user *User) clearCart() error {
-	user.Cart = []CartItem{}
+	user.Cart.Items = []CartItem{}
 
 	_, err := database.UsersCollection.UpdateOne(context.Background(), bson.M{"id": user.Id}, user)
 	return err
