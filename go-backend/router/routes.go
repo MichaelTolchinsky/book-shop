@@ -8,13 +8,17 @@ import (
 
 func SetupUserRoutes(app *fiber.App) {
 	api := app.Group("/api/user")
-	api.Post("/signup", )
-	api.Post("/login", )
+	api.Post("/signup", handlers.CreateUser)
+	api.Post("/login", handlers.UserLogin)
 }
 
 func SetupBooksRoutes(app *fiber.App) {
 	api := app.Group("/api/books")
+
+	api.Post("/", handlers.CreateBook) // need to checkauth middleware
+
 	api.Get("/", handlers.GetBooks)
 	api.Get("/:id", handlers.GetBook)
 	api.Get("/cart/:userId", handlers.GetCart)
+
 }

@@ -2,6 +2,10 @@ package handlers
 
 import "github.com/gofiber/fiber/v2"
 
-func createUser(c *fiber.Ctx) error {}
+func CreateUser(c *fiber.Ctx) error {
+	return c.SendString("nininin")
+}
 
-func userLogin(c *fiber.Ctx) error {}
+func UserLogin(c *fiber.Ctx) error {
+	return c.SendString("nininin")
+}

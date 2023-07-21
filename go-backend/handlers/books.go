@@ -81,3 +81,20 @@ func GetCart(c *fiber.Ctx) error {
 		"message": "Cart fetched successfully",
 	})
 }
+
+func CreateBook(c *fiber.Ctx) error {
+	book := new(models.Book)
+
+	if err := c.BodyParser(book); err != nil {
+		return err
+	}
+	book.Id = primitive.NewObjectID()
+
+	result, err := database.BooksCollection.InsertOne(context.Background(), book)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Creating a book failed"})
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Book added successfully",
+		"book": result})
+}
