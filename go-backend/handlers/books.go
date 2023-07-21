@@ -98,3 +98,36 @@ func CreateBook(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Book added successfully",
 		"book": result})
 }
+
+func AddToCart(c *fiber.Ctx) error {
+	var book models.Book
+	var user models.User
+
+	bookId, _ := primitive.ObjectIDFromHex(c.Params("id"))
+
+	var requestBody map[string]string
+	c.BodyParser(&requestBody)
+
+	userId, _ := primitive.ObjectIDFromHex(requestBody["userId"])
+
+	errBook := database.BooksCollection.FindOne(context.Background(), bson.M{"_id": bookId}).Decode(&book)
+	if errBook != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": fmt.Sprintf("book %s not found", bookId)})
+	}
+
+	errUser := database.UsersCollection.FindOne(context.Background(), bson.M{"_id": userId}).Decode(&user)
+	if errUser != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": fmt.Sprintf("user %s not found", userId)})
+	}
+
+	err := user.AddToCart(&book)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "adding item to cart Failed",
+		})
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"message": "item added to cart",
+	})
+}

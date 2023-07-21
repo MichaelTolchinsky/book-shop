@@ -7,6 +7,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type User struct {
@@ -18,30 +19,46 @@ type User struct {
 	} `json:"cart" bson:"cart"`
 }
 
-func (user *User) addToCart(book *Book) {
+func (user *User) AddToCart(book *Book) error {
 	bookId := book.Id
+	cartBookIndex := -1
 
-	cartBookIndex := sort.Search(len(user.Cart.Items), func(i int) bool {
-		return user.Cart.Items[i].BookId.String() == bookId.String()
-	})
+	for i, item := range user.Cart.Items {
+		if item.BookId == bookId {
+			cartBookIndex = i
+			break
+		}
+	}
 
 	if cartBookIndex >= 0 {
 		user.Cart.Items[cartBookIndex].Quantity++
 	} else {
 		user.Cart.Items = append(user.Cart.Items, CartItem{
+			Id:       primitive.NewObjectID(),
 			BookId:   bookId,
 			Quantity: 1,
 			Price:    book.Price,
 		})
 	}
 
-	_, err := database.UsersCollection.InsertOne(context.Background(), user)
-	if err != nil {
-		panic(err)
+	// Filter for finding the user by Id
+	filter := bson.M{"_id": user.Id}
+
+	// Update with the cart items using upsert option
+	update := bson.M{"$set": bson.M{"cart.items": user.Cart.Items}}
+
+	opts := options.FindOneAndUpdate().SetUpsert(true)
+
+	result := database.UsersCollection.FindOneAndUpdate(context.Background(), filter, update, opts)
+
+	if result.Err() != nil {
+		return result.Err()
 	}
+
+	return nil
 }
 
-func (user *User) removeFromCart(book *Book) error {
+func (user *User) RemoveFromCart(book *Book) error {
 	bookId := book.Id
 
 	cartBookIndex := sort.Search(len(user.Cart.Items), func(i int) bool {
@@ -56,7 +73,7 @@ func (user *User) removeFromCart(book *Book) error {
 	return err
 }
 
-func (user *User) clearCart() error {
+func (user *User) ClearCart() error {
 	user.Cart.Items = []CartItem{}
 
 	_, err := database.UsersCollection.UpdateOne(context.Background(), bson.M{"id": user.Id}, user)

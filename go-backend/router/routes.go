@@ -15,7 +15,8 @@ func SetupUserRoutes(app *fiber.App) {
 func SetupBooksRoutes(app *fiber.App) {
 	api := app.Group("/api/books")
 
-	api.Post("/", handlers.CreateBook) // need to checkauth middleware
+	api.Post("/", handlers.CreateBook) // need to add auth middleware
+	api.Post("/cart/:id",handlers.AddToCart); // need to add auth middleware
 
 	api.Get("/", handlers.GetBooks)
 	api.Get("/:id", handlers.GetBook)
