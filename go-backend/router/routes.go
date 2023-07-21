@@ -15,11 +15,16 @@ func SetupUserRoutes(app *fiber.App) {
 func SetupBooksRoutes(app *fiber.App) {
 	api := app.Group("/api/books")
 
-	api.Post("/", handlers.CreateBook) // need to add auth middleware
-	api.Post("/cart/:id",handlers.AddToCart); // need to add auth middleware
+	api.Post("/", handlers.CreateBook)        // need to add auth middleware
+	api.Post("/cart/:id", handlers.AddToCart) // need to add auth middleware
+
+	api.Put("/cart/:id", handlers.ClearCart) // need to add auth middleware
+	api.Put("/:id", handlers.UpdateBook) // need to add auth middleware
+
+	// api.Delete("/cart/:id", handlers.removeFromCart) // need to add auth middleware
+	// api.Delete("/:id", handlers.DeleteBook) // need to add auth middleware
 
 	api.Get("/", handlers.GetBooks)
 	api.Get("/:id", handlers.GetBook)
 	api.Get("/cart/:userId", handlers.GetCart)
-
 }

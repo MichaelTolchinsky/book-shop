@@ -99,6 +99,20 @@ func CreateBook(c *fiber.Ctx) error {
 		"book": result})
 }
 
+func UpdateBook(c *fiber.Ctx) error {
+	book := new(models.Book)
+	if err := c.BodyParser(book); err != nil {
+		return err
+	}
+
+	_, err := database.BooksCollection.ReplaceOne(context.Background(), bson.M{"_id": book.Id}, book)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Could not update book"})
+	}
+
+	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Updated successfully"})
+}
+
 func AddToCart(c *fiber.Ctx) error {
 	var book models.Book
 	var user models.User
@@ -129,5 +143,26 @@ func AddToCart(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"message": "item added to cart",
+	})
+}
+
+func ClearCart(c *fiber.Ctx) error {
+	var user models.User
+	userId, _ := primitive.ObjectIDFromHex(c.Params("id"))
+
+	err := database.UsersCollection.FindOne(context.Background(), bson.M{"_id": userId}).Decode(&user)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": "user not found :("})
+	}
+
+	err = user.ClearCart()
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "failed clearing cart",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "cart cleared successfully",
 	})
 }

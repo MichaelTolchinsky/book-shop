@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"fmt"
 	"go-backend/database"
 	"sort"
 
@@ -43,10 +44,8 @@ func (user *User) AddToCart(book *Book) error {
 
 	// Filter for finding the user by Id
 	filter := bson.M{"_id": user.Id}
-
 	// Update with the cart items using upsert option
 	update := bson.M{"$set": bson.M{"cart.items": user.Cart.Items}}
-
 	opts := options.FindOneAndUpdate().SetUpsert(true)
 
 	result := database.UsersCollection.FindOneAndUpdate(context.Background(), filter, update, opts)
@@ -69,13 +68,34 @@ func (user *User) RemoveFromCart(book *Book) error {
 		user.Cart.Items = append(user.Cart.Items[:cartBookIndex], user.Cart.Items[cartBookIndex+1:]...)
 	}
 
-	_, err := database.UsersCollection.InsertOne(context.Background(), user)
-	return err
+	// Filter for finding the user by Id
+	filter := bson.M{"_id": user.Id}
+	// Update with the cart items using upsert option
+	update := bson.M{"$set": bson.M{"cart.items": user.Cart.Items}}
+	opts := options.FindOneAndUpdate().SetUpsert(true)
+
+	result := database.UsersCollection.FindOneAndUpdate(context.Background(), filter, update, opts)
+	if result.Err() != nil {
+		fmt.Println(result.Err())
+		return result.Err()
+	}
+
+	return nil
 }
 
 func (user *User) ClearCart() error {
 	user.Cart.Items = []CartItem{}
 
-	_, err := database.UsersCollection.UpdateOne(context.Background(), bson.M{"id": user.Id}, user)
-	return err
+	// Filter for finding the user by Id
+	filter := bson.M{"_id": user.Id}
+	// Update with the cart items using upsert option
+	update := bson.M{"$set": bson.M{"cart.items": []CartItem{}}}
+	opts := options.FindOneAndUpdate().SetUpsert(true)
+
+	result := database.UsersCollection.FindOneAndUpdate(context.Background(), filter, update, opts)
+	if result.Err() != nil {
+		fmt.Println(result.Err())
+		return result.Err()
+	}
+	return nil
 }
