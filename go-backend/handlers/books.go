@@ -113,6 +113,22 @@ func UpdateBook(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Updated successfully"})
 }
 
+func DeleteBook(c *fiber.Ctx) error {
+	bookId, _ := primitive.ObjectIDFromHex(c.Params("id"))
+
+	result, err := database.BooksCollection.DeleteOne(context.Background(), bson.M{"_id": bookId})
+
+	if err != nil || result.DeletedCount == 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "deleting book failed",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Book deleted successfully",
+	})
+}
+
 func AddToCart(c *fiber.Ctx) error {
 	var book models.Book
 	var user models.User
@@ -165,4 +181,22 @@ func ClearCart(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "cart cleared successfully",
 	})
+}
+
+func RemoveFromCart(c *fiber.Ctx) error {
+	var user models.User
+	var book models.Book
+	bookId, _ := primitive.ObjectIDFromHex(c.Query("bookId"))
+	userId, _ := primitive.ObjectIDFromHex(c.Params("id"))
+
+	database.BooksCollection.FindOne(context.Background(), bson.M{"_id": bookId}).Decode(&book)
+
+	database.UsersCollection.FindOne(context.Background(), bson.M{"_id": userId}).Decode(&user)
+
+	err := user.RemoveFromCart(&book)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "remove failed"})
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "item removed successfully"})
 }

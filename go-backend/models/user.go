@@ -76,7 +76,6 @@ func (user *User) RemoveFromCart(book *Book) error {
 
 	result := database.UsersCollection.FindOneAndUpdate(context.Background(), filter, update, opts)
 	if result.Err() != nil {
-		fmt.Println(result.Err())
 		return result.Err()
 	}
 
