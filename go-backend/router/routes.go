@@ -2,6 +2,7 @@ package router
 
 import (
 	"go-backend/handlers"
+	"go-backend/middleware"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -15,14 +16,14 @@ func SetupUserRoutes(app *fiber.App) {
 func SetupBooksRoutes(app *fiber.App) {
 	api := app.Group("/api/books")
 
-	api.Post("/", handlers.CreateBook)        // need to add auth middleware
-	api.Post("/cart/:id", handlers.AddToCart) // need to add auth middleware
+	api.Post("/", middleware.JwtMiddleware(), handlers.CreateBook)
+	api.Post("/cart/:id", middleware.JwtMiddleware(), handlers.AddToCart)
 
-	api.Put("/cart/:id", handlers.ClearCart) // need to add auth middleware
-	api.Put("/:id", handlers.UpdateBook) // need to add auth middleware
+	api.Put("/cart/:id", middleware.JwtMiddleware(), handlers.ClearCart)
+	api.Put("/:id", middleware.JwtMiddleware(), handlers.UpdateBook)
 
-	api.Delete("/cart/:id", handlers.RemoveFromCart) // need to add auth middleware
-	api.Delete("/:id", handlers.DeleteBook) // need to add auth middleware
+	api.Delete("/cart/:id", middleware.JwtMiddleware(), handlers.RemoveFromCart)
+	api.Delete("/:id", middleware.JwtMiddleware(), handlers.DeleteBook)
 
 	api.Get("/", handlers.GetBooks)
 	api.Get("/:id", handlers.GetBook)
