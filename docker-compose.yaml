@@ -37,3 +37,4 @@ services:
     tty: true
     depends_on: 
       - backend
+      - go-backend

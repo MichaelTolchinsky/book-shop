@@ -14,7 +14,33 @@ import (
 )
 
 func CreateUser(c *fiber.Ctx) error {
-	return c.SendString("nininin")
+	var requestBody map[string]string
+	c.BodyParser(&requestBody)
+
+	email := requestBody["email"]
+	password := requestBody["password"]
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+
+	if err != nil {
+		panic("hash gone wrong")
+	}
+
+	user := models.User{
+		Email:    email,
+		Password: string(hashedPassword),
+	}
+
+	_, insertErr := database.UsersCollection.InsertOne(context.Background(), user)
+	if insertErr != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid authentication credentials",
+		})
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"message": "User Created",
+	})
 }
 
 func UserLogin(c *fiber.Ctx) error {
