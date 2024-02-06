@@ -13,25 +13,24 @@ import { BooksModule } from './books/books.module';
 import { CartComponent } from './cart/cart.component';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    HeaderComponent,
-    ErrorComponent,
-    CartComponent
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    BrowserAnimationsModule,
-    MaterialModule,
-    HttpClientModule,
-    BooksModule,
-  ],
-  providers: [
-    {provide:HTTP_INTERCEPTORS,useClass:AuthInterceptor,multi:true},
-    {provide:HTTP_INTERCEPTORS,useClass:ErrorInterceptor,multi:true}
-  ],
-  bootstrap: [AppComponent],
-  entryComponents:[ErrorComponent]
+    declarations: [
+        AppComponent,
+        HeaderComponent,
+        ErrorComponent,
+        CartComponent
+    ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        MaterialModule,
+        HttpClientModule,
+        BooksModule,
+    ],
+    providers: [
+        { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
+    ],
+    bootstrap: [AppComponent]
 })
 export class AppModule { }
