@@ -4,3 +4,4 @@ node_modules
 **./frontend/src/environments/environment.ts
 **tmp
 **main
+**/dist
