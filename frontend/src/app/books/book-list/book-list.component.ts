@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Book } from '../book.model';
 import { Subscription } from 'rxjs';
 import { BooksService } from '../books.service';
-import { LegacyPageEvent as PageEvent } from '@angular/material/legacy-paginator';
+import { PageEvent } from '@angular/material/paginator';
 import { AuthService } from 'src/app/auth/auth.service';
 import { map } from 'rxjs/operators';
 

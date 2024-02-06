@@ -1,8 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { BooksService } from '../books/books.service';
 import { Subscription } from 'rxjs';
-import { async } from '@angular/core/testing';
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 
 @Component({
