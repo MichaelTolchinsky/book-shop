@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormControl, Validators } from '@angular/forms';
 import { mimeType } from './mime-type.validator';
 import { BooksService } from '../books.service';
 import { ActivatedRoute, ParamMap } from '@angular/router';
@@ -13,7 +13,7 @@ import { Book } from '../book.model';
 export class BookCreateComponent implements OnInit {
 
   isLoading = false;
-  form: FormGroup;
+  form: UntypedFormGroup;
   imagePreview: string;
   book:Book;
   private mode = 'create';
@@ -21,21 +21,21 @@ export class BookCreateComponent implements OnInit {
   constructor(private booksService: BooksService,private route:ActivatedRoute) { }
 
   ngOnInit(): void {
-    this.form = new FormGroup({
-      title: new FormControl(null, {
+    this.form = new UntypedFormGroup({
+      title: new UntypedFormControl(null, {
         validators: [Validators.required, Validators.minLength(5)]
       }),
-      author: new FormControl(null, {
+      author: new UntypedFormControl(null, {
         validators: [Validators.required, Validators.minLength(5)],
         asyncValidators: [mimeType]
       }),
-      price: new FormControl(null, {
+      price: new UntypedFormControl(null, {
         validators: [Validators.required, Validators.min(10), Validators.max(1500)],
       }),
-      image: new FormControl(null, {
+      image: new UntypedFormControl(null, {
         validators: [Validators.required]
       }),
-      description: new FormControl(null, {
+      description: new UntypedFormControl(null, {
         validators: [Validators.required, Validators.minLength(10)]
       })
     })
