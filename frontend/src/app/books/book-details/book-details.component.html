@@ -1,5 +1,7 @@
-<mat-spinner *ngIf="isLoading"></mat-spinner>
-<mat-card *ngIf="!isLoading">
+@if(isLoading) {
+<mat-spinner></mat-spinner>
+} @else {
+<mat-card>
   <mat-card-header>
     <mat-card-title>{{ book.title }}</mat-card-title>
     <mat-card-subtitle>by {{ book.author }}</mat-card-subtitle>
@@ -7,7 +9,7 @@
   </mat-card-header>
   <img mat-card-image [src]="book.imageURL" [alt]="book.title" />
   <mat-card-content>
-     <p>
+    <p>
       {{ book.description }}
     </p>
   </mat-card-content>
@@ -15,3 +17,4 @@
     <button mat-button color="primary" (click)="onAddToCart()">Add To Cart</button>
   </mat-card-actions>
 </mat-card>
+}
