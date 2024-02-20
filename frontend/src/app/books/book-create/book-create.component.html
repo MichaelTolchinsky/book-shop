@@ -11,7 +11,7 @@
     </mat-form-field>
     <mat-form-field>
       <input matInput type="text" formControlName="author" placeholder="Author Name" />
-      @if(*ngIf=form.get('author').invalid){
+      @if(form.get('author').invalid){
       <mat-error>Please enter Author Name.</mat-error>
       }
     </mat-form-field>
