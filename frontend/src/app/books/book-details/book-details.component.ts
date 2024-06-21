@@ -3,6 +3,7 @@ import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { BooksService } from '../books.service';
 import { Book } from '../book.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { CartService } from 'src/app/cart/cart.service';
 
 @Component({
   selector: 'app-book-details',
@@ -15,7 +16,7 @@ export class BookDetailsComponent implements OnInit {
   bookId: string;
   book: Book;
 
-  constructor(private route: ActivatedRoute, private booksService: BooksService,private snackBar:MatSnackBar) { }
+  constructor(private route: ActivatedRoute, private booksService: BooksService,private cartService: CartService,private snackBar:MatSnackBar) { }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((paramMap: ParamMap) => {
@@ -44,7 +45,7 @@ export class BookDetailsComponent implements OnInit {
     if (!this.book) {
       return;
     }
-    this.booksService.addToCart(this.bookId);
+    this.cartService.addToCart(this.bookId);
     this.openSnackBar();
   }
 

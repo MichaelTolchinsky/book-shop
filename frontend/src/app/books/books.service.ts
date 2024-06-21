@@ -12,8 +12,6 @@ const BACKEND_URL = `${environment.apiUrl}/books/`;
 export class BooksService {
   private books: Book[] = [];
   private booksUpdated = new Subject<{ books: Book[], bookCount: number }>();
-  private cart: any[] = [];
-  private cartUpdated = new Subject<any>();
 
   constructor(private http: HttpClient, private router: Router) { }
 
@@ -80,34 +78,4 @@ export class BooksService {
   deleteBook(bookId: string) {
     return this.http.delete(BACKEND_URL + bookId);
   }
-
-  addToCart(bookId: string) {
-    const userId = localStorage.getItem('userId');
-    this.http.post(BACKEND_URL + 'cart/' + bookId, { userId: userId }).subscribe(reuslt => {
-      this.router.navigate(['/']);
-    });
-  }
-
-  getCart() {
-    const userId = localStorage.getItem('userId');
-    this.http.get<{ message: string, cart: any }>(BACKEND_URL + 'cart/' + userId).subscribe(cartData => {
-      this.cart = cartData.cart;
-      this.cartUpdated.next({ cart: [...this.cart] });
-    });
-  }
-
-  getCartUpdateListener() {
-    return this.cartUpdated.asObservable();
-  }
-
-  removeFromCart(bookId: string) {
-    const userId = localStorage.getItem('userId');
-    return this.http.delete(BACKEND_URL + 'cart/' + userId, { params: { 'bookId': bookId } });
-  }
-
-  clearCart() {
-    const userId = localStorage.getItem('userId');
-    return this.http.put(BACKEND_URL + 'cart/' + userId, null);
-  }
-
 }

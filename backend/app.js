@@ -2,9 +2,9 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require('cors')
 require('dotenv').config();
-
 const booksRoutes = require('./routes/books');
 const userRoutes = require('./routes/user');
+const cartRoutes = require('./routes/cart');
 
 const app = express();
 app.use(cors())
@@ -20,5 +20,6 @@ mongoose.connect(`mongodb+srv://${process.env.MONGO_ATLAS_USER}:${process.env.MO
 
 app.use('/api/books',booksRoutes);
 app.use('/api/user',userRoutes);
+app.use('/api/cart',cartRoutes);
 
 module.exports = app;
