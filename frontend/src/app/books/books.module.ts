@@ -6,6 +6,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from '../material.module';
 import { AppRoutingModule } from '../app-routing.module';
 import { BookDetailsComponent } from './book-details/book-details.component';
+import { CartModule } from "../cart/cart.module";
+import { CartService } from "../cart/cart.service";
 
 @NgModule({
   declarations: [
@@ -17,7 +19,9 @@ import { BookDetailsComponent } from './book-details/book-details.component';
     CommonModule,
     ReactiveFormsModule,
     MaterialModule,
-    AppRoutingModule
-  ]
+    AppRoutingModule,
+    CartModule,
+  ],
+  providers: [CartService]
 })
 export class BooksModule { }

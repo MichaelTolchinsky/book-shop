@@ -10,14 +10,14 @@ import { AuthInterceptor } from './auth/auth.interptor';
 import { ErrorComponent } from './error/error.component';
 import { ErrorInterceptor } from './error.interceptor';
 import { BooksModule } from './books/books.module';
-import { CartComponent } from './cart/cart.component';
+import { CartModule } from './cart/cart.module';
+import { CartService } from './cart/cart.service';
 
 @NgModule({
     declarations: [
         AppComponent,
         HeaderComponent,
         ErrorComponent,
-        CartComponent
     ],
     imports: [
         BrowserModule,
@@ -26,10 +26,12 @@ import { CartComponent } from './cart/cart.component';
         MaterialModule,
         HttpClientModule,
         BooksModule,
+        CartModule,
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-        { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
+        { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+        CartService,
     ],
     bootstrap: [AppComponent]
 })
