@@ -1,42 +1,40 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { BooksService } from '../books/books.service';
-import { Subscription } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
-
+import { CartService } from './cart.service';
 
 @Component({
   selector: 'app-cart',
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.css']
 })
-export class CartComponent implements OnInit, OnDestroy {
-
+export class CartComponent implements OnInit {
   isLoading = false
-  cart: any[];
+  cart = new BehaviorSubject([]);
   totalPrice: number = 0;
-  private cartObs: Subscription;
-  constructor(private booksService: BooksService,private snackBar:MatSnackBar) { }
+
+  constructor(private cartService: CartService,private snackBar:MatSnackBar) { }
 
   ngOnInit(): void {
-    this.booksService.getCart();
     this.isLoading = true;
-    this.cartObs = this.booksService.getCartUpdateListener().subscribe(cartData => {
+    this.cartService.getCart().subscribe((cartData) => {
+      this.cart.next(cartData.cart.items ?? [])
       this.isLoading = false;
-      this.cart = cartData.cart;
       this.getCartPrice();
-    })
+    });
+  
   }
 
   onRemoveItem(bookId: string) {
     this.openSnackBar();
-    this.booksService.removeFromCart(bookId).subscribe(() => {
-      this.booksService.getCart();
+    this.cartService.removeFromCart(bookId).subscribe((cartData) => {
+      this.cart.next(cartData.cart.items ?? [])
       this.getCartPrice();
     }, () => this.isLoading = false);
   }
 
   onOrder() {
-    this.booksService.clearCart().subscribe(() => {
+    this.cartService.clearCart().subscribe(() => {
       this.cart = null;
       this.totalPrice = 0;
       alert('thanks for buying with us');
@@ -45,7 +43,7 @@ export class CartComponent implements OnInit, OnDestroy {
 
   private getCartPrice() {
     this.totalPrice = 0;
-    this.cart.forEach(item => {
+    this.cart.value.forEach(item => {
       this.totalPrice += (item.price * item.quantity);
     });
   }
@@ -54,9 +52,5 @@ export class CartComponent implements OnInit, OnDestroy {
     this.snackBar.open('book removed from cart','close', {
       duration: 1000,
     });
-  }
-
-  ngOnDestroy() {
-    this.cartObs.unsubscribe();
   }
 }
