@@ -6,3 +6,8 @@ node_modules
 **main
 **/dist
 **.angular
+/shelf/
+/workspace.xml
+.gradle
+.idea
+build
