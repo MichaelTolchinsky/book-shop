@@ -1,15 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../auth.service';
-import { NgForm } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { MaterialModule } from 'src/app/material.module';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+    selector: 'app-login',
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.css'],
+    imports:[
+      CommonModule,
+      FormsModule,
+      MaterialModule,
+    ]
 })
 export class LoginComponent implements OnInit {
-
   isLoading = false;
   private authStatusSub:Subscription;
   
@@ -32,5 +38,4 @@ export class LoginComponent implements OnInit {
   ngOnDestroy(){
     this.authStatusSub.unsubscribe();
   }
-
 }

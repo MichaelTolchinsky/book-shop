@@ -4,11 +4,19 @@ import { BooksService } from '../books.service';
 import { Book } from '../book.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CartService } from 'src/app/cart/cart.service';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MaterialModule } from 'src/app/material.module';
 
 @Component({
-  selector: 'app-book-details',
-  templateUrl: './book-details.component.html',
-  styleUrls: ['./book-details.component.css']
+    selector: 'app-book-details',
+    templateUrl: './book-details.component.html',
+    styleUrls: ['./book-details.component.css'],
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        MaterialModule,
+      ],
 })
 export class BookDetailsComponent implements OnInit {
 

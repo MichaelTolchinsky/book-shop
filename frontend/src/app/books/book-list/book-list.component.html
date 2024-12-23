@@ -16,7 +16,7 @@
       </p>
     </mat-card-content>
     <mat-card-actions>
-      <button mat-button [routerLink]="['/details',book.id]">Details</button>
+      <button mat-button [routerLink]="['/details', book.id]">Details</button>
     </mat-card-actions>
     <mat-card-actions *ngIf="isUserAuthenticated && userId == book.creator">
       <button mat-button [routerLink]="['/edit', book.id]">Edit</button>

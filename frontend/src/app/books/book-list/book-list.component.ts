@@ -5,20 +5,28 @@ import { BooksService } from '../books.service';
 import { PageEvent } from '@angular/material/paginator';
 import { AuthService } from 'src/app/auth/auth.service';
 import { map } from 'rxjs/operators';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
+import { CartService } from 'src/app/cart/cart.service';
+import { MaterialModule } from 'src/app/material.module';
+import { MatButtonModule } from '@angular/material/button';
+import { RouterModule } from '@angular/router';
 
 @Component({
-  selector: 'app-book-list',
-  templateUrl: './book-list.component.html',
-  styleUrls: ['./book-list.component.css']
+    selector: 'app-book-list',
+    templateUrl: './book-list.component.html',
+    styleUrls: ['./book-list.component.css'],
+    imports: [
+        CommonModule,
+        MaterialModule,
+        RouterModule,
+      ],
 })
 export class BookListComponent implements OnInit, OnDestroy {
-
   isUserAuthenticated = false;
   userId: string;
-
   isLoading = false;
   books: Book[] = [];
-
   totalBooks = 0;
   booksPerPage = 2;
   currentPage = 1;
@@ -26,6 +34,7 @@ export class BookListComponent implements OnInit, OnDestroy {
 
   private booksSub: Subscription;
   private authStatusSub: Subscription;
+
   constructor(private booksService: BooksService, private authservice: AuthService) { }
 
   ngOnInit(): void {
