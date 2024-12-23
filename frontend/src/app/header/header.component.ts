@@ -1,21 +1,20 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { RouterModule } from '@angular/router';
 import { MaterialModule } from '../material.module';
-import { NgIf } from '@angular/common';
 
 @Component({
     selector: 'app-header',
     templateUrl: './header.component.html',
     styleUrls: ['./header.component.css'],
-    imports: [RouterModule, MaterialModule,NgIf],
+    imports: [RouterModule, MaterialModule],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent implements OnInit,OnDestroy {
   userIsAuthenticated = false;
   private authListenerSub:Subscription;
-
-  constructor(private authService:AuthService) { }
+  private authService = inject(AuthService);
 
   ngOnInit(): void {
     this.userIsAuthenticated = this.authService.getIsAuth();
@@ -31,5 +30,4 @@ export class HeaderComponent implements OnInit,OnDestroy {
   ngOnDestroy(){
     this.authListenerSub.unsubscribe();
   }
-
 }

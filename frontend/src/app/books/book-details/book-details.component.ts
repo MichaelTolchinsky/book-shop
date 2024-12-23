@@ -12,11 +12,7 @@ import { MaterialModule } from 'src/app/material.module';
     selector: 'app-book-details',
     templateUrl: './book-details.component.html',
     styleUrls: ['./book-details.component.css'],
-    imports: [
-        CommonModule,
-        ReactiveFormsModule,
-        MaterialModule,
-      ],
+    imports: [CommonModule,ReactiveFormsModule,MaterialModule,],
 })
 export class BookDetailsComponent implements OnInit {
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, inject } from '@angular/core';
 import { Book } from '../book.model';
 import { Subscription } from 'rxjs';
 import { BooksService } from '../books.service';
@@ -16,11 +16,8 @@ import { RouterModule } from '@angular/router';
     selector: 'app-book-list',
     templateUrl: './book-list.component.html',
     styleUrls: ['./book-list.component.css'],
-    imports: [
-        CommonModule,
-        MaterialModule,
-        RouterModule,
-      ],
+    imports: [CommonModule,MaterialModule,RouterModule],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookListComponent implements OnInit, OnDestroy {
   isUserAuthenticated = false;
@@ -34,8 +31,8 @@ export class BookListComponent implements OnInit, OnDestroy {
 
   private booksSub: Subscription;
   private authStatusSub: Subscription;
-
-  constructor(private booksService: BooksService, private authservice: AuthService) { }
+  private booksService = inject(BooksService);
+  private authservice = inject(AuthService);
 
   ngOnInit(): void {
     this.isLoading = true;

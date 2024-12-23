@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CartService } from './cart.service';
@@ -10,13 +10,15 @@ import { MaterialModule } from '../material.module';
     templateUrl: './cart.component.html',
     styleUrls: ['./cart.component.css'],
     imports: [CommonModule,MaterialModule],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CartComponent implements OnInit {
   isLoading = false
   cart = new BehaviorSubject([]);
   totalPrice: number = 0;
 
-  constructor(private cartService: CartService,private snackBar:MatSnackBar) { }
+  private cartService = inject(CartService);
+  private snackBar = inject(MatSnackBar);
 
   ngOnInit(): void {
     this.isLoading = true;
