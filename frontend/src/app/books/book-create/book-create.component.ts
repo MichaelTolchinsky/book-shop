@@ -1,23 +1,31 @@
 import { Component, OnInit } from '@angular/core';
-import { UntypedFormGroup, UntypedFormControl, Validators } from '@angular/forms';
+import { UntypedFormGroup, UntypedFormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { mimeType } from './mime-type.validator';
 import { BooksService } from '../books.service';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Book } from '../book.model';
+import { CommonModule } from '@angular/common';
+import { MaterialModule } from 'src/app/material.module';
 
 @Component({
-  selector: 'app-book-create',
-  templateUrl: './book-create.component.html',
-  styleUrls: ['./book-create.component.css']
+    selector: 'app-book-create',
+    templateUrl: './book-create.component.html',
+    styleUrls: ['./book-create.component.css'],
+    imports: [
+      CommonModule,
+      ReactiveFormsModule,
+      MaterialModule,
+    ],
 })
 export class BookCreateComponent implements OnInit {
-
   isLoading = false;
   form: UntypedFormGroup;
   imagePreview: string;
   book:Book;
+
   private mode = 'create';
   private bookId:string
+  
   constructor(private booksService: BooksService,private route:ActivatedRoute) { }
 
   ngOnInit(): void {
