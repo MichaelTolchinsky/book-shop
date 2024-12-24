@@ -12,6 +12,7 @@ import { BookListComponent } from './app/books/book-list/book-list.component';
 import { CartComponent } from './app/cart/cart.component';
 import { LoginComponent } from './app/auth/login/login.component';
 import { SignupComponent } from './app/auth/signup/signup.component';
+import { NgZone, provideExperimentalZonelessChangeDetection } from '@angular/core';
 
 const routes: Routes = [
   {path:'',redirectTo:'/home',pathMatch:'full'},
@@ -34,6 +35,7 @@ const routes: Routes = [
 
 bootstrapApplication(AppComponent, {
   providers: [
+    provideExperimentalZonelessChangeDetection(),
     provideRouter(routes),
     provideHttpClient(withInterceptorsFromDi()),
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../auth.service';
 import { FormsModule, NgForm } from '@angular/forms';
@@ -9,18 +9,14 @@ import { MaterialModule } from 'src/app/material.module';
     selector: 'app-login',
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.css'],
-    imports:[
-      CommonModule,
-      FormsModule,
-      MaterialModule,
-    ]
+    imports:[CommonModule,FormsModule,MaterialModule],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent implements OnInit {
   isLoading = false;
   private authStatusSub:Subscription;
+  private authService = inject(AuthService)
   
-  constructor(private authService:AuthService) { }
-
   ngOnInit() {
     this.authStatusSub = this.authService.getAuthStatusListener().subscribe(authStatus =>{
       this.isLoading = false;
