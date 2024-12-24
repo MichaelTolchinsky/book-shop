@@ -2,17 +2,17 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { AppComponent } from './app/app.component';
 import { provideRouter, Routes } from '@angular/router';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { AuthInterceptor } from './app/auth/auth.interptor';
-import { CartService } from './app/cart/cart.service';
-import { ErrorInterceptor } from './app/error.interceptor';
-import { AuthGuard } from './app/auth/auth.guard';
-import { BookCreateComponent } from './app/books/book-create/book-create.component';
-import { BookDetailsComponent } from './app/books/book-details/book-details.component';
-import { BookListComponent } from './app/books/book-list/book-list.component';
-import { CartComponent } from './app/cart/cart.component';
-import { LoginComponent } from './app/auth/login/login.component';
-import { SignupComponent } from './app/auth/signup/signup.component';
-import { NgZone, provideExperimentalZonelessChangeDetection } from '@angular/core';
+import { AuthInterceptor } from './app/common/interceptors/auth.interceptor';
+import { CartService } from './app/common/services/cart.service';
+import { AuthGuard } from './app/common/guards/auth.guard';
+import { BookCreateComponent } from './app/components/books/book-create/book-create.component';
+import { BookDetailsComponent } from './app/components/books/book-details/book-details.component';
+import { BookListComponent } from './app/components/books/book-list/book-list.component';
+import { CartComponent } from './app/components/cart/cart.component';
+import { LoginComponent } from './app/components/auth/login/login.component';
+import { SignupComponent } from './app/components/auth/signup/signup.component';
+import { provideExperimentalZonelessChangeDetection } from '@angular/core';
+import { ErrorInterceptor } from './app/common/interceptors/error.interceptor';
 
 const routes: Routes = [
   {path:'',redirectTo:'/home',pathMatch:'full'},
