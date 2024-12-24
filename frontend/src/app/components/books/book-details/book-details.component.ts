@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { Book } from '../../../common/models/book.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -9,11 +9,11 @@ import { CartService } from 'src/app/common/services/cart.service';
 import { BooksService } from 'src/app/common/services/books.service';
 
 @Component({
-    selector: 'app-book-details',
-    templateUrl: './book-details.component.html',
-    styleUrls: ['./book-details.component.css'],
-    imports: [CommonModule,ReactiveFormsModule,MaterialModule],
-    changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-book-details',
+  templateUrl: './book-details.component.html',
+  styleUrls: ['./book-details.component.css'],
+  imports: [CommonModule, ReactiveFormsModule, MaterialModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookDetailsComponent implements OnInit {
   isLoading = false;
@@ -24,6 +24,7 @@ export class BookDetailsComponent implements OnInit {
   private booksService = inject(BooksService);
   private cartService = inject(CartService);
   private snackBar = inject(MatSnackBar);
+  private cdr = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((paramMap: ParamMap) => {
@@ -39,13 +40,15 @@ export class BookDetailsComponent implements OnInit {
             price: bookData.price,
             imageURL: bookData.imageURL,
             description: bookData.description,
-            creator: bookData.creator
-          }
-        })
+            creator: bookData.creator,
+          };
+
+          this.cdr.detectChanges();
+        });
       } else {
         this.bookId = null;
       }
-    })
+    });
   }
 
   onAddToCart() {
