@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, inject, ChangeDetectorRef } from '@angular/core';
 import { Book } from '../book.model';
 import { Subscription } from 'rxjs';
 import { BooksService } from '../books.service';
@@ -33,6 +33,7 @@ export class BookListComponent implements OnInit, OnDestroy {
   private authStatusSub: Subscription;
   private booksService = inject(BooksService);
   private authservice = inject(AuthService);
+  private cdr = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
     this.isLoading = true;
@@ -49,6 +50,7 @@ export class BookListComponent implements OnInit, OnDestroy {
       this.isLoading = false;
       this.totalBooks = booksData.bookCount;
       this.books = booksData.books;
+      this.cdr.detectChanges();
     });
     this.isUserAuthenticated = this.authservice.getIsAuth
     ();

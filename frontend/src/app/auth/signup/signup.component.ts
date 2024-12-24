@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, inject } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { AuthService } from '../auth.service';
 import { Subscription } from 'rxjs';
@@ -9,17 +9,13 @@ import { MaterialModule } from 'src/app/material.module';
     selector: 'app-signup',
     templateUrl: './signup.component.html',
     styleUrls: ['./signup.component.css'],
-    imports:[
-      CommonModule,
-      FormsModule,
-      MaterialModule,
-    ]
+    imports:[CommonModule,FormsModule,MaterialModule],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SignupComponent implements OnInit,OnDestroy {
   isLoading = false;
   private authStatusSub:Subscription;
-
-  constructor(private authService:AuthService) { }
+  private authService = inject(AuthService);
 
   ngOnInit() {
     this.authStatusSub = this.authService.getAuthStatusListener().subscribe(authStatus =>{
@@ -38,5 +34,4 @@ export class SignupComponent implements OnInit,OnDestroy {
   ngOnDestroy(){
     this.authStatusSub.unsubscribe();
   }
-
 }

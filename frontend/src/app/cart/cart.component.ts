@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CartService } from './cart.service';
@@ -19,6 +19,7 @@ export class CartComponent implements OnInit {
 
   private cartService = inject(CartService);
   private snackBar = inject(MatSnackBar);
+  private cdr = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
     this.isLoading = true;
@@ -26,6 +27,7 @@ export class CartComponent implements OnInit {
       this.cart.next(cartData.cart.items ?? [])
       this.isLoading = false;
       this.getCartPrice();
+      this.cdr.detectChanges();
     });
   
   }

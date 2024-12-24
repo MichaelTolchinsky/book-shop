@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { UntypedFormGroup, UntypedFormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { mimeType } from './mime-type.validator';
 import { BooksService } from '../books.service';
@@ -11,11 +11,8 @@ import { MaterialModule } from 'src/app/material.module';
     selector: 'app-book-create',
     templateUrl: './book-create.component.html',
     styleUrls: ['./book-create.component.css'],
-    imports: [
-      CommonModule,
-      ReactiveFormsModule,
-      MaterialModule,
-    ],
+    imports: [CommonModule,ReactiveFormsModule,MaterialModule],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookCreateComponent implements OnInit {
   isLoading = false;
@@ -25,9 +22,9 @@ export class BookCreateComponent implements OnInit {
 
   private mode = 'create';
   private bookId:string
+  private booksService = inject(BooksService);
+  private route = inject(ActivatedRoute);
   
-  constructor(private booksService: BooksService,private route:ActivatedRoute) { }
-
   ngOnInit(): void {
     this.form = new UntypedFormGroup({
       title: new UntypedFormControl(null, {
@@ -105,5 +102,4 @@ export class BookCreateComponent implements OnInit {
     }
     this.form.reset();
   }
-
 }

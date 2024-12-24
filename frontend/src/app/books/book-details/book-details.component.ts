@@ -1,26 +1,29 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import { BooksService } from '../books.service';
 import { Book } from '../book.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { CartService } from 'src/app/cart/cart.service';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from 'src/app/material.module';
+import { CartService } from 'src/app/cart/cart.service';
 
 @Component({
     selector: 'app-book-details',
     templateUrl: './book-details.component.html',
     styleUrls: ['./book-details.component.css'],
-    imports: [CommonModule,ReactiveFormsModule,MaterialModule,],
+    imports: [CommonModule,ReactiveFormsModule,MaterialModule],
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookDetailsComponent implements OnInit {
-
   isLoading = false;
   bookId: string;
   book: Book;
 
-  constructor(private route: ActivatedRoute, private booksService: BooksService,private cartService: CartService,private snackBar:MatSnackBar) { }
+  private route = inject(ActivatedRoute);
+  private booksService = inject(BooksService);
+  private cartService = inject(CartService);
+  private snackBar = inject(MatSnackBar);
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((paramMap: ParamMap) => {
