@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy, inject, ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Book } from '../../../common/models/book.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CommonModule } from '@angular/common';
@@ -21,6 +21,7 @@ export class BookDetailsComponent implements OnInit {
   book: Book;
 
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private booksService = inject(BooksService);
   private cartService = inject(CartService);
   private snackBar = inject(MatSnackBar);
@@ -55,7 +56,11 @@ export class BookDetailsComponent implements OnInit {
     if (!this.book) {
       return;
     }
-    this.cartService.addToCart(this.bookId);
+
+    this.cartService.addToCart(this.bookId).subscribe(() => {
+      this.router.navigate(['/']);
+    });
+
     this.openSnackBar();
   }
 

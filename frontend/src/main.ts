@@ -13,8 +13,7 @@ const routes: Routes = [
   { path: 'home', component: BookListComponent },
   {
     path: 'home',
-    loadComponent: () =>
-      import('src/app/components/books/book-list/book-list.component').then(c => c.BookListComponent),
+    component: BookListComponent,
   },
   {
     path: 'addbook',
