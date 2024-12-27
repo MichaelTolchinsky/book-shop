@@ -5,10 +5,6 @@
 # Live Version
 https://book-shop-frontend.vercel.app/
 
-# Sample user
- - email: test3@test.com
- - password: test3test
-
 # Run locally on your machine with mongo atlas
 1. create a .env file in backend folder
 2. the .env file should contain your mongodb details
