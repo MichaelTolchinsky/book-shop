@@ -10,11 +10,11 @@ import { AuthService } from 'src/app/common/services/auth.service';
 import { BooksService } from 'src/app/common/services/books.service';
 
 @Component({
-    selector: 'app-book-list',
-    templateUrl: './book-list.component.html',
-    styleUrls: ['./book-list.component.css'],
-    imports: [CommonModule,MaterialModule,RouterModule],
-    changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-book-list',
+  templateUrl: './book-list.component.html',
+  styleUrls: ['./book-list.component.css'],
+  imports: [CommonModule, MaterialModule, RouterModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookListComponent implements OnInit, OnDestroy {
   isUserAuthenticated = false;
@@ -27,7 +27,6 @@ export class BookListComponent implements OnInit, OnDestroy {
   pageSizeOptions = [1, 2, 5, 10];
 
   private booksSub: Subscription;
-  private authStatusSub: Subscription;
   private booksService = inject(BooksService);
   private authservice = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
@@ -36,33 +35,35 @@ export class BookListComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.booksService.getBooks(this.booksPerPage, this.currentPage);
     this.userId = this.authservice.getUserId();
-    this.booksSub = this.booksService.getBooksupdateListener().pipe(
-      map(bookData => {
+    this.booksSub = this.booksService
+      .getBooksupdateListener()
+      .pipe(
+        map(bookData => {
           bookData.books.map(book => {
-          book.description = book.description.slice(0,150);
-        })
-        return bookData;
-      })
-    ).subscribe(booksData => {
-      this.isLoading = false;
-      this.totalBooks = booksData.bookCount;
-      this.books = booksData.books;
-      this.cdr.detectChanges();
-    });
-    this.isUserAuthenticated = this.authservice.getIsAuth
-    ();
-    this.authStatusSub = this.authservice.getAuthStatusListener().subscribe(isAuthenticated => {
-      this.isUserAuthenticated = isAuthenticated;
-    })
+            book.description = book.description.slice(0, 150);
+          });
+          return bookData;
+        }),
+      )
+      .subscribe(booksData => {
+        this.isLoading = false;
+        this.totalBooks = booksData.bookCount;
+        this.books = booksData.books;
+        this.cdr.detectChanges();
+      });
+    this.isUserAuthenticated = this.authservice.getIsAuth();
   }
 
   onDelete(bookId: string) {
     this.isLoading = true;
-    this.booksService.deleteBook(bookId).subscribe(() => {
-      this.booksService.getBooks(this.booksPerPage, this.currentPage);
-    }, () => this.isLoading = false);
+    this.booksService.deleteBook(bookId).subscribe(
+      () => {
+        this.booksService.getBooks(this.booksPerPage, this.currentPage);
+      },
+      () => (this.isLoading = false),
+    );
   }
-  
+
   onChangedPage(pageData: PageEvent) {
     this.isLoading = true;
     this.currentPage = pageData.pageIndex + 1;
@@ -72,6 +73,5 @@ export class BookListComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.booksSub.unsubscribe();
-    this.authStatusSub.unsubscribe();
   }
 }

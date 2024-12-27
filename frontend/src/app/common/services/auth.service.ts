@@ -1,5 +1,4 @@
-import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
@@ -7,126 +6,105 @@ import { AuthData } from '../models/auth-data.model';
 
 const BACKEND_URL = `${environment.apiUrl}/user/`;
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
+  private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
 
-  private isAuthenticated = false;
-  private token: string;
-  private tokenTimer: any;
-  private userId: string;
-  private authStatusListener = new Subject<boolean>();
+  token = signal<string | null>(null);
+  userId = signal<string | null>(null);
+  isAuthenticated = signal<boolean>(false);
 
-  constructor(private http: HttpClient, private router: Router) { }
-
-  getToken(){
-    return this.token;
+  getToken(): string | null {
+    return this.token();
   }
 
-  getIsAuth(){
-    return this.isAuthenticated;
+  getIsAuth(): boolean {
+    return this.isAuthenticated();
   }
 
-  getUserId(){
-    return this.userId;
+  getUserId(): string | null {
+    return this.userId();
   }
 
-  getAuthStatusListener() {
-    return this.authStatusListener.asObservable();
-  }
-
-  createUser(email: string, password: string) {
-    const authData: AuthData = {
-      email: email,
-      password: password
-    };
-    this.http.post(BACKEND_URL+'signup', authData).subscribe(() => {
-      this.router.navigate(['/']);
-    }, error => {
-      this.authStatusListener.next(false);
-    })
-  };
-
-  login(email: string, password: string) {
-    const authData: AuthData = {
-      email: email,
-      password: password
-    };
-    this.http.post<{ token: string, expiresIn: number, userId: string }>(BACKEND_URL+'login', authData).subscribe(res => {
-      const token = res.token;
-      this.token = token;
-      if (token) {
-        const expiresInDuration = res.expiresIn;
-        this.setAuthTimer(expiresInDuration);
-        this.isAuthenticated = true;
-        this.userId = res.userId;
-        this.authStatusListener.next(true);
-        const now = new Date();
-        const expirationDate = new Date(now.getTime() + expiresInDuration * 1000);
-        this.saveAuthData(token, expirationDate, this.userId);
-        this.router.navigate(['/']);
-      }
-    }, error => {
-      this.authStatusListener.next(false);
+  createUser(email: string, password: string): void {
+    const authData: AuthData = { email, password };
+    this.http.post(`${BACKEND_URL}/signup`, authData).subscribe({
+      next: () => this.router.navigate(['/']),
+      error: () => this.isAuthenticated.set(false),
     });
   }
 
-  autoLoginUser(){
+  login(email: string, password: string): void {
+    const authData: AuthData = { email, password };
+    this.http.post<{ token: string; expiresIn: number; userId: string }>(`${BACKEND_URL}login`, authData).subscribe({
+      next: res => this.handleLoginSuccess(res),
+      error: () => this.isAuthenticated.set(false),
+    });
+  }
+
+  autoLoginUser(): void {
     const authInfo = this.getAuthData();
-    if(!authInfo){
+    if (!authInfo) {
       return;
     }
     const now = new Date();
     const expiresIn = authInfo.expirationDate.getTime() - now.getTime();
-    if(expiresIn > 0){
-      this.token = authInfo.token;
-      this.isAuthenticated = true;
-      this.userId = authInfo.userId;
-      this.setAuthTimer(expiresIn / 1000);
-      this.authStatusListener.next(true);
+    if (expiresIn > 0) {
+      this.setSession(authInfo.token, authInfo.userId, expiresIn / 1000);
     }
   }
 
-  logout(){
-    this.token = null;
-    this.isAuthenticated = false;
-    this.authStatusListener.next(false);
-    clearTimeout(this.tokenTimer);
-    this.clearAuthData();
-    this.userId =null;
+  logout(): void {
+    this.clearSession();
     this.router.navigate(['/']);
   }
 
-  private setAuthTimer(duration: number) {
-    this.tokenTimer = setTimeout(() => {
-      this.logout();
-    }, duration*1000);
+  private handleLoginSuccess(res: { token: string; expiresIn: number; userId: string }): void {
+    const expirationDate = new Date(new Date().getTime() + res.expiresIn * 1000);
+    this.setSession(res.token, res.userId, res.expiresIn);
+    this.saveAuthData(res.token, expirationDate, res.userId);
+    this.router.navigate(['/']);
   }
 
-  private saveAuthData(token:string,expirationDate:Date,userId:string){
-    localStorage.setItem('token',token);
-    localStorage.setItem('expirationDate',expirationDate.toISOString());
-    localStorage.setItem('userId',userId);
+  private setSession(token: string, userId: string, expiresIn: number): void {
+    this.token.set(token);
+    this.userId.set(userId);
+    this.isAuthenticated.set(true);
+
+    setTimeout(() => this.logout(), expiresIn * 1000);
   }
 
-  private clearAuthData(){
+  private clearSession(): void {
+    this.token.set(null);
+    this.userId.set(null);
+    this.isAuthenticated.set(false);
+    this.clearAuthData();
+  }
+
+  private saveAuthData(token: string, expirationDate: Date, userId: string): void {
+    localStorage.setItem('token', token);
+    localStorage.setItem('expirationDate', expirationDate.toISOString());
+    localStorage.setItem('userId', userId);
+  }
+
+  private clearAuthData(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('expirationDate');
     localStorage.removeItem('userId');
   }
 
-  private getAuthData(){
+  private getAuthData(): { token: string; expirationDate: Date; userId: string } | null {
     const token = localStorage.getItem('token');
     const expirationDate = localStorage.getItem('expirationDate');
     const userId = localStorage.getItem('userId');
-    if(!token || !expirationDate){
-      return;
+    if (!token || !expirationDate) {
+      return null;
     }
     return {
-      token:token,
-      expirationDate:new Date(expirationDate),
-      userId:userId
+      token,
+      expirationDate: new Date(expirationDate),
+      userId,
     };
   }
 }
